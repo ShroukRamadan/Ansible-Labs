@@ -1,0 +1,25 @@
+- name: Ansible Playbook to Install and Configure Niginx Ubuntu 
+  hosts: web
+  become: true
+  tasks:
+   - name: Install Nginx
+     apt:
+      name: nginx
+      state: latest
+      
+   - name: Change Port
+     replace:
+       path: /etc/nginx/sites-enabled/default
+       regexp: '80'
+       replace: "8090"
+   - name: move html file 
+     copy:
+       src: ./index.html
+       dest: /var/www/html 
+
+   - name: Restart Nginx
+     service: 
+        name: nginx 
+        state: restarted 
+        enabled: yes
+

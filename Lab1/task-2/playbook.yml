@@ -1,0 +1,120 @@
+- name: Ansible Playbook to Deploy Django Project
+  hosts: web
+  become: true
+  tasks:
+   - name: Copy Django Project to Instance 
+     copy:
+      src: Booster_CI_CD_Project.zip
+      dest: ~/
+   - name: install zip
+     apt:
+      name: zip
+      state: present
+
+   - name: Unarchive a file that is already on the remote machine
+     unarchive:
+        src: ~/Booster_CI_CD_Project.zip
+        dest: ~/
+        remote_src: yes
+  
+   - name: install python3
+     apt:
+      name: python3
+      state: latest
+
+   - name: install python3-pip
+     apt:
+      update_cache: yes
+      name: python3-pip
+      state: latest
+  
+   - name: Install  requirements.txt
+     pip:
+      requirements: ~/Booster_CI_CD_Project/requirements.txt
+      executable: pip3
+
+     
+   - name: copy sh script
+     copy: 
+       src: commands.sh
+       dest: ~/Booster_CI_CD_Project
+
+   - name: Make Migrations and Apply migrations and Start Server
+     shell: commands.sh
+     args:
+      chdir:  ~/Booster_CI_CD_Project
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# - name: Deploy app
+#   hosts: web1
+#   become: true
+#   tasks:
+#    - name: copy app files to server
+#      copy:
+#       src: Booster_CI_CD_Project.zip
+#       dest: ~/
+
+#    - name: install zip
+#      apt:
+#       name: zip
+#       state: present
+
+#    - name: Unarchive a file that is already on the remote machine
+#      unarchive:
+#         src: ~/Booster_CI_CD_Project.zip
+#         dest: ~/
+#         remote_src: yes
+
+#    - name: install python3
+#      apt:
+#       name: python3
+#       state: present
+
+
+#    - name: install python3-pip
+#      apt:
+#       update_cache: yes
+#       name: python3-pip
+#       state: present
+
+#    - name: install Dependencies from requirements.txt
+#      pip:
+#       requirements: ~/Booster_CI_CD_Project/requirements.txt
+#       executable: pip3
+    
+#    - name: make migrations for DB
+#      command: "python3 ~/Booster_CI_CD_Project/manage.py makemigrations"
+   
+#    - name: apply the migrations
+#      command: "python3 ~/Booster_CI_CD_Project/manage.py migrate"
+
+#    - name: start the server
+#      command: "python3 ~/Booster_CI_CD_Project/manage.py runserver 0.0.0.0:8000"
+     
+
