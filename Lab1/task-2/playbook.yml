@@ -37,13 +37,15 @@
    - name: copy sh script
      copy: 
        src: commands.sh
-       dest: ~/Booster_CI_CD_Project
+       dest: ~/Booster_CI_CD_Project/commands.sh
+       mode: 0755
 
    - name: Make Migrations and Apply migrations and Start Server
      shell: commands.sh
      args:
       chdir:  ~/Booster_CI_CD_Project
-
+     async: 45
+     poll: 0
 
 
 
