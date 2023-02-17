@@ -1,4 +1,5 @@
 ansibe.pem
 terraform*
 .terraform
+.terraform.lock
 .gitignore
