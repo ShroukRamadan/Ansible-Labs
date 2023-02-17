@@ -1,3 +1,4 @@
 ansibe.pem
 terraform*
 .terraform
+.gitignore
