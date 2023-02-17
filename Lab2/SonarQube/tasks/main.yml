@@ -1,0 +1,98 @@
+---
+# tasks file for SonarQube
+
+    - name: install zip
+      apt:
+       name: zip
+       state: present
+
+    - name: Download sonarqube zip
+      get_url:
+       url: "https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-7.9.6.zip"
+       dest: ./sonarqube
+
+    - name: extract sonarqube
+      unarchive:
+        remote_src: true
+        src: ./sonarqube
+        dest: .
+ 
+    - name: mv sonarqube directory
+      shell: "mv sonarqube-7.9.6 /opt/sonarqube"
+
+    # - name: mv sonarqube folder
+    #   copy:
+    #    src: ./sonarqube-7.3/
+    #    dest: /opt/sonarqube/
+    #    remote_src: yes
+
+    - name: Add sonar user
+      user:
+        name: sonar
+        group: sonar
+        home: /opt/sonarqube   
+
+
+    - name: change sonarqube directory owner to the newly created user
+      command: "chown -R sonar:sonar /opt/sonarqube"
+
+    # - name: Change owner to sonar
+    #   file:
+    #    dest: /opt/sonarqube
+    #    owner: sonar
+    #    group: sonar
+    #    recurse: yes
+
+    # - name: Edit the SonarQube configuration file
+    #   replace:
+    #     path: /opt/sonarqube/conf/sonar.properties
+    #     regexp:  '# Set the sonar.jdbc.username and sonar.jdbc.password appropriately.'
+        
+    #     replace: 
+    #     - 'sonar.jdbc.username=sonar
+    #        sonar.jdbc.password=my_strong_password
+    #        sonar.jdbc.url=jdbc:postgresql://localhost:5432/sonarqube
+    #        '
+
+    - name: "Uncomment username line"
+      replace:
+        path: /opt/sonarqube/conf/sonar.properties
+        regexp: '#sonar.jdbc.username='
+        replace: 'sonar.jdbc.username=sonar'
+    
+    - name: "Uncomment password line"
+      replace:
+        path: /opt/sonarqube/conf/sonar.properties
+        regexp: '#sonar.jdbc.password='
+        replace: 'sonar.jdbc.password=my_strong_password \n sonar.jdbc.url=jdbc:postgresql://localhost:5432/sonarqube'
+      
+    - name: Edit the sonar script file
+      replace:
+        path: /opt/sonarqube/bin/linux-x86-64/sonar.sh
+        regexp: '#RUN_AS_USER='
+        replace: 'RUN_AS_USER=sonar'
+         
+
+    - name: Copy sonar.service
+      copy:
+       src: ./sonar.service
+       dest: /etc/systemd/system/
+
+    - name: Restart service sonar
+      service:
+          name: sonar
+          state: restarted
+          enabled: true
+
+
+    - name: Edit the sysctl configuration file.
+      copy:
+       src: ./sysctl.conf
+       dest: /etc/sysctl.conf
+
+
+    - name: reboot the machine
+      reboot:
+      
+      
+      
